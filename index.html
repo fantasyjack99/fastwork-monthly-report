@@ -4,185 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>工作報告 2026/3/24 - 4/7 | FastWork</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'PingFang TC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        :root { --bg: #0a0a1a; --card: #12122a; --accent: #6366f1; --accent2: #8b5cf6; --cyan: #06b6d4; --green: #22c55e; --yellow: #eab308; --red: #ef4444; --text: #f1f5f9; --text-dim: #94a3b8; }
+        body { font-family: 'Segoe UI', 'PingFang TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
         
-        /* Slide Navigation */
-        .slide-nav { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 8px; }
-        .nav-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; }
-        .nav-dot:hover, .nav-dot.active { background: #60a5fa; transform: scale(1.2); }
+        /* Animated Background */
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .bg-animation::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.08) 0%, transparent 40%); animation: bgPulse 15s ease-in-out infinite; }
+        @keyframes bgPulse { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-5%, 5%) scale(1.1); } }
         
-        /* Slides */
-        .slide { min-height: 100vh; padding: 60px 80px; display: none; animation: fadeIn 0.5s ease; }
-        .slide.active { display: flex; flex-direction: column; justify-content: center; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Slide 1 - Overview */
-        .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
-        .stat-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transition: transform 0.3s; cursor: pointer; }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-card .number { font-size: 5em; font-weight: bold; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-card .label { font-size: 1.5em; margin-top: 10px; color: #94a3b8; }
-        .stat-card .trend { font-size: 0.9em; margin-top: 10px; padding: 5px 15px; border-radius: 20px; display: inline-block; }
-        .trend.up { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .trend.down { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        
-        /* Slide 2 - Status */
-        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
-        .donut-chart { position: relative; width: 250px; height: 250px; margin: 0 auto; }
-        .donut-chart::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: #0f172a; border-radius: 50%; }
-        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1; }
-        .donut-center .num { font-size: 2.5em; font-weight: bold; color: #60a5fa; }
-        .donut-center .txt { font-size: 0.9em; color: #94a3b8; }
-        .status-legend { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
-        .legend-item { display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: all 0.3s; }
-        .legend-item:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
-        .legend-color { width: 20px; height: 20px; border-radius: 6px; }
-        .legend-label { font-size: 1.1em; }
-        .legend-count { margin-left: auto; font-size: 1.5em; font-weight: bold; color: #60a5fa; }
-        
-        /* Slide 3 - Timeline */
-        .timeline { position: relative; max-width: 900px; margin: 40px auto; }
-        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #60a5fa, #a78bfa, #f472b6); transform: translateX(-50%); }
-        .timeline-item { display: flex; margin-bottom: 30px; position: relative; }
-        .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
-        .timeline-content { width: 45%; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; cursor: pointer; transition: all 0.3s; }
-        .timeline-content:hover { background: rgba(255,255,255,0.1); transform: scale(1.02); }
-        .timeline-dot { position: absolute; left: 50%; top: 20px; width: 16px; height: 16px; background: #60a5fa; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px rgba(96, 165, 250, 0.5); }
-        .timeline-date { font-size: 0.85em; color: #94a3b8; margin-bottom: 8px; }
-        .timeline-title { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
-        .timeline-cat { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.8em; margin-top: 8px; }
-        .cat-urgent { background: rgba(239, 68, 68, 0.3); color: #f87171; }
-        .cat-important { background: rgba(250, 204, 21, 0.3); color: #fbbf24; }
-        .cat-normal { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
-        
-        /* Slide 4 - Categories */
-        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 40px; }
-        .cat-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; }
-        .cat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .cat-card h3 { font-size: 1.3em; margin-bottom: 15px; }
-        .cat-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
-        .cat-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
-        .cat-count { font-size: 2em; font-weight: bold; color: #60a5fa; }
-        .cat-percent { font-size: 0.9em; color: #94a3b8; margin-left: 10px; }
-        
-        /* Slide 5 - Highlights */
-        .highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
-        .highlight-card { background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; }
-        .highlight-card:hover { transform: scale(1.02); border-color: rgba(96, 165, 250, 0.6); }
-        .highlight-icon { font-size: 3em; margin-bottom: 15px; }
-        .highlight-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
-        .highlight-desc { color: #94a3b8; font-size: 0.95em; line-height: 1.6; }
-        
-        /* Slide 6 - Summary */
-        .summary-box { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 25px; padding: 50px; margin-top: 40px; text-align: center; }
-        .summary-box h2 { font-size: 2.5em; margin-bottom: 30px; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .summary-stats { display: flex; justify-content: center; gap: 60px; }
-        .summary-stat .num { font-size: 4em; font-weight: bold; color: #60a5fa; }
-        .summary-stat .label { font-size: 1.2em; color: #94a3b8; }
+        /* Slide System */
+        .slide { min-height: 100vh; padding: 60px 80px; display: none; }
+        .slide.active { display: flex; flex-direction: column; justify-content: center; animation: slideIn 0.6s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
         /* Navigation */
-        .nav-arrows { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
-        .nav-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; cursor: pointer; transition: all 0.3s; font-size: 1em; }
-        .nav-btn:hover { background: #60a5fa; border-color: #60a5fa; }
+        .nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 100; background: rgba(18,18,42,0.8); padding: 12px 24px; border-radius: 50px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .nav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; transition: all 0.3s; font-size: 1.2em; display: flex; align-items: center; justify-content: center; }
+        .nav-btn:hover, .nav-btn.active { background: var(--accent); transform: scale(1.1); }
+        .slide-counter { position: fixed; bottom: 30px; right: 30px; font-size: 1.1em; color: var(--text-dim); z-index: 100; }
+        .page-arrows { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+        .arrow-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; cursor: pointer; transition: all 0.3s; font-size: 1em; }
+        .arrow-btn:hover { background: var(--accent); border-color: var(--accent); }
         
-        /* Slide indicator */
-        .slide-counter { position: fixed; bottom: 30px; right: 30px; font-size: 1.2em; color: #94a3b8; z-index: 100; }
+        /* Title Slide */
+        .title-slide { text-align: center; }
+        .title-slide h1 { font-size: 4em; background: linear-gradient(135deg, var(--cyan), var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; animation: titleGlow 3s ease-in-out infinite; }
+        @keyframes titleGlow { 0%, 100% { filter: drop-shadow(0 0 20px rgba(99,102,241,0.5)); } 50% { filter: drop-shadow(0 0 40px rgba(99,102,241,0.8)); } }
+        .title-slide .subtitle { font-size: 1.5em; color: var(--text-dim); margin-bottom: 40px; }
+        .title-slide .date-range { font-size: 2em; color: var(--cyan); font-weight: bold; }
+        .title-slide .stats-preview { display: flex; justify-content: center; gap: 60px; margin-top: 60px; }
+        .stat-mini { text-align: center; padding: 30px 50px; background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-mini .num { font-size: 4em; font-weight: bold; color: var(--cyan); }
+        .stat-mini .label { font-size: 1.2em; color: var(--text-dim); margin-top: 10px; }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            .slide { padding: 40px 30px; }
-            .overview-grid, .chart-container, .cat-grid { grid-template-columns: 1fr; }
-            .timeline::before { left: 20px; }
-            .timeline-item, .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
-            .timeline-content { width: calc(100% - 50px); }
-            .timeline-dot { left: 20px; }
-        }
+        /* Cards Grid */
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .card { background: var(--card); border-radius: 24px; padding: 35px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.4s; cursor: pointer; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--cyan), var(--accent)); opacity: 0; transition: opacity 0.3s; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(99,102,241,0.3); }
+        .card:hover::before { opacity: 1; }
+        .card-icon { font-size: 4em; margin-bottom: 20px; }
+        .card h3 { font-size: 1.5em; margin-bottom: 10px; }
+        .card .number { font-size: 5em; font-weight: bold; background: linear-gradient(135deg, var(--cyan), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card .trend { display: inline-block; padding: 8px 20px; border-radius: 30px; font-size: 0.9em; margin-top: 15px; }
+        .trend.up { background: rgba(34,197,94,0.2); color: var(--green); }
+        .trend.info { background: rgba(99,102,241,0.2); color: var(--accent); }
         
-        /* Animations */
-        .fade-in { animation: fadeIn 0.6s ease forwards; }
-        .delay-1 { animation-delay: 0.2s; opacity: 0; }
-        .delay-2 { animation-delay: 0.4s; opacity: 0; }
-        .delay-3 { animation-delay: 0.6s; opacity: 0; }
+        /* Charts Section */
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+        .chart-card { background: var(--card); border-radius: 24px; padding: 35px; border: 1px solid rgba(255,255,255,0.1); }
+        .chart-card h3 { font-size: 1.5em; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .chart-container { position: relative; height: 300px; }
+        
+        /* Timeline */
+        .timeline-container { max-width: 900px; margin: 40px auto; position: relative; }
+        .timeline-container::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--cyan), var(--accent), var(--accent2)); border-radius: 2px; transform: translateX(-50%); }
+        .timeline-item { display: flex; margin-bottom: 25px; position: relative; }
+        .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+        .timeline-content { width: 42%; padding: 20px 25px; background: var(--card); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s; }
+        .timeline-content:hover { background: rgba(99,102,241,0.2); transform: scale(1.03); }
+        .timeline-dot { position: absolute; left: 50%; top: 25px; width: 20px; height: 20px; background: var(--cyan); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px var(--cyan); z-index: 1; }
+        .timeline-date { font-size: 0.85em; color: var(--text-dim); margin-bottom: 8px; }
+        .timeline-title { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; }
+        .timeline-cat { display: inline-block; padding: 4px 15px; border-radius: 20px; font-size: 0.8em; }
+        .cat-urgent { background: rgba(239,68,68,0.3); color: var(--red); }
+        .cat-important { background: rgba(234,179,8,0.3); color: var(--yellow); }
+        .cat-normal { background: rgba(34,197,94,0.3); color: var(--green); }
+        
+        /* Categories */
+        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 40px; }
+        .cat-card { background: var(--card); border-radius: 24px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s; }
+        .cat-card:hover { transform: scale(1.05); border-color: var(--accent); }
+        .cat-icon { font-size: 4em; margin-bottom: 15px; }
+        .cat-card h3 { font-size: 1.3em; margin-bottom: 15px; }
+        .cat-bar { height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; margin: 15px 0; overflow: hidden; }
+        .cat-bar-fill { height: 100%; border-radius: 6px; transition: width 1.5s ease; }
+        .cat-count { font-size: 3em; font-weight: bold; color: var(--cyan); }
+        .cat-percent { font-size: 1em; color: var(--text-dim); }
+        
+        /* Highlights */
+        .highlights-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
+        .highlight-card { background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.1) 100%); border: 1px solid rgba(99,102,241,0.3); border-radius: 24px; padding: 35px; cursor: pointer; transition: all 0.3s; }
+        .highlight-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 50px rgba(99,102,241,0.3); }
+        .highlight-icon { font-size: 3.5em; margin-bottom: 20px; }
+        .highlight-title { font-size: 1.5em; font-weight: bold; margin-bottom: 15px; }
+        .highlight-desc { color: var(--text-dim); font-size: 1em; line-height: 1.7; }
+        .highlight-count { display: inline-block; padding: 8px 20px; background: var(--accent); border-radius: 30px; font-size: 0.9em; margin-top: 15px; }
+        
+        /* Summary Slide */
+        .summary-card { background: linear-gradient(135deg, var(--card) 0%, rgba(99,102,241,0.2) 100%); border-radius: 30px; padding: 60px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-top: 40px; }
+        .summary-card h2 { font-size: 2.5em; background: linear-gradient(135deg, var(--cyan), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 40px; }
+        .summary-stats { display: flex; justify-content: center; gap: 80px; }
+        .summary-stat .num { font-size: 5em; font-weight: bold; color: var(--cyan); }
+        .summary-stat .label { font-size: 1.3em; color: var(--text-dim); margin-top: 10px; }
+        .summary-note { max-width: 700px; margin: 40px auto 0; color: var(--text-dim); font-size: 1.1em; line-height: 1.8; }
+        .summary-note strong { color: var(--accent); }
+        
+        /* Floating Elements */
+        .float-icon { position: fixed; font-size: 2em; opacity: 0.1; animation: float 6s ease-in-out infinite; }
+        .float-1 { top: 20%; left: 10%; animation-delay: 0s; }
+        .float-2 { top: 60%; right: 15%; animation-delay: 2s; }
+        .float-3 { bottom: 20%; left: 20%; animation-delay: 4s; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(10deg); } }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card); padding: 40px; border-radius: 24px; max-width: 600px; width: 90%; border: 1px solid rgba(255,255,255,0.2); }
+        .modal h3 { font-size: 1.5em; margin-bottom: 20px; color: var(--cyan); }
+        .modal-close { margin-top: 20px; padding: 10px 30px; background: var(--accent); border: none; border-radius: 20px; color: white; cursor: pointer; }
+        
+        /* Progress Bar Animation */
+        .progress-anim { animation: progressFill 2s ease forwards; }
+        @keyframes progressFill { from { width: 0; } }
     </style>
 </head>
 <body>
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Decorations -->
+    <div class="float-icon float-1">📊</div>
+    <div class="float-icon float-2">💼</div>
+    <div class="float-icon float-3">✨</div>
+    
     <!-- Navigation -->
-    <div class="slide-nav">
-        <div class="nav-dot active" onclick="goToSlide(0)"></div>
-        <div class="nav-dot" onclick="goToSlide(1)"></div>
-        <div class="nav-dot" onclick="goToSlide(2)"></div>
-        <div class="nav-dot" onclick="goToSlide(3)"></div>
-        <div class="nav-dot" onclick="goToSlide(4)"></div>
-        <div class="nav-dot" onclick="goToSlide(5)"></div>
+    <div class="nav">
+        <button class="nav-btn active" onclick="goToSlide(0)">📋</button>
+        <button class="nav-btn" onclick="goToSlide(1)">📈</button>
+        <button class="nav-btn" onclick="goToSlide(2)">📅</button>
+        <button class="nav-btn" onclick="goToSlide(3)">🏷️</button>
+        <button class="nav-btn" onclick="goToSlide(4)">✨</button>
+        <button class="nav-btn" onclick="goToSlide(5)">📊</button>
     </div>
     <div class="slide-counter"><span id="current">1</span> / 6</div>
-    <div class="nav-arrows">
-        <button class="nav-btn" onclick="prevSlide()">◀ 上一頁</button>
-        <button class="nav-btn" onclick="nextSlide()">下一頁 ▶</button>
+    <div class="page-arrows">
+        <button class="arrow-btn" onclick="prevSlide()">◀ 上一頁</button>
+        <button class="arrow-btn" onclick="nextSlide()">下一頁 ▶</button>
     </div>
 
-    <!-- Slide 1: Overview -->
+    <!-- Slide 1: Title -->
     <div class="slide active" id="slide-0">
-        <h1 style="font-size: 3em; text-align: center; margin-bottom: 20px;">📊 工作概覽</h1>
-        <p style="text-align: center; color: #94a3b8; font-size: 1.3em;">2026年3月24日 - 4月7日 | 為期半個月</p>
-        <div class="overview-grid">
-            <div class="stat-card fade-in delay-1">
-                <div class="number">23</div>
-                <div class="label">已完成任務</div>
-                <div class="trend up">▲ 78% 完成率</div>
+        <div class="title-slide">
+            <h1>工作報告</h1>
+            <p class="subtitle">FastWork 工作看板</p>
+            <p class="date-range">2026.03.24 — 04.07</p>
+            <div class="stats-preview">
+                <div class="stat-mini">
+                    <div class="num">23</div>
+                    <div class="label">已完成任務</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="num">3</div>
+                    <div class="label">進行中</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="num">4</div>
+                    <div class="label">待處理</div>
+                </div>
             </div>
-            <div class="stat-card fade-in delay-2">
-                <div class="number">3</div>
-                <div class="label">進行中</div>
-                <div class="trend down">▼ 10% 進行中</div>
-            </div>
-            <div class="stat-card fade-in delay-3">
-                <div class="number">4</div>
-                <div class="label">待處理</div>
-                <div class="trend down">▼ 12% 待處理</div>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 40px; color: #64748b;">
-            <p>點擊任意卡片進入詳細分析 →</p>
         </div>
     </div>
 
-    <!-- Slide 2: Status Distribution -->
+    <!-- Slide 2: Charts -->
     <div class="slide" id="slide-1">
-        <h1 style="font-size: 2.5em; text-align: center;">📈 任務狀態分布</h1>
-        <div class="chart-container">
-            <div class="donut-chart">
-                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg);">
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="12"/>
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" stroke-width="12" 
-                        stroke-dasharray="163.36 251.33" stroke-dashoffset="0" class="donut-segment"/>
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#eab308" stroke-width="12" 
-                        stroke-dasharray="20.42 251.33" stroke-dashoffset="-163.36" class="donut-segment"/>
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" stroke-width="12" 
-                        stroke-dasharray="8.17 251.33" stroke-dashoffset="-183.78" class="donut-segment"/>
-                </svg>
-                <div class="donut-center">
-                    <div class="num">30</div>
-                    <div class="txt">總任務</div>
+        <h1 style="font-size: 2.5em; text-align: center; margin-bottom: 20px;">📈 任務狀態分析</h1>
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>🏆 任務完成比例</h3>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
-            <div class="status-legend">
-                <div class="legend-item" onclick="alert('已完成: 23 項重要任務，包括：\n• 機房巡檢優化\n• 人員報到/離職異動\n• 自動化腳本建置')">
-                    <div class="legend-color" style="background: #22c55e;"></div>
-                    <div class="legend-label">已完成 (DONE)</div>
-                    <div class="legend-count">23</div>
-                </div>
-                <div class="legend-item" onclick="alert('進行中: 3 項\n• 報到-李家愷\n• 觀察訪客網路\n• 其他')">
-                    <div class="legend-color" style="background: #eab308;"></div>
-                    <div class="legend-label">進行中 (DOING)</div>
-                    <div class="legend-count">3</div>
-                </div>
-                <div class="legend-item" onclick="alert('待處理: 4 項\n• 分享會支援\n• 留停-李育瑄\n• 其他')">
-                    <div class="legend-color" style="background: #ef4444;"></div>
-                    <div class="legend-label">待處理 (TODO)</div>
-                    <div class="legend-count">4</div>
+            <div class="chart-card">
+                <h3>📅 每日完成任務數</h3>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
                 </div>
             </div>
         </div>
@@ -190,11 +189,11 @@
 
     <!-- Slide 3: Timeline -->
     <div class="slide" id="slide-2">
-        <h1 style="font-size: 2.5em; text-align: center;">📅 完成時間軸</h1>
-        <div class="timeline">
+        <h1 style="font-size: 2.5em; text-align: center; margin-bottom: 20px;">📅 完成時間軸</h1>
+        <div class="timeline-container">
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
-                <div class="timeline-content">
+                <div class="timeline-content" onclick="showModal('4/7 重要', '戴瑞儀 分機無法撥出\n狀態: 已完成\n備註: 緊急修復')">
                     <div class="timeline-date">2026/04/07</div>
                     <div class="timeline-title">戴瑞儀 分機無法撥出</div>
                     <span class="timeline-cat cat-important">重要</span>
@@ -202,42 +201,34 @@
             </div>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
-                <div class="timeline-content">
+                <div class="timeline-content" onclick="showModal('4/1 緊急', '機房巡檢表時間修正\n狀態: 已完成\n問題: 時區偏移已補正')">
                     <div class="timeline-date">2026/04/01</div>
-                    <div class="timeline-title">4月宏遠請款作業</div>
+                    <div class="timeline-title">機房巡檢表時間修正 / 自動化請款時間</div>
                     <span class="timeline-cat cat-important">重要</span>
                 </div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="timeline-date">2026/04/01</div>
-                    <div class="timeline-title">lulu螢幕異常</div>
-                    <span class="timeline-cat cat-important">重要</span>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                    <div class="timeline-date">2026/04/01</div>
-                    <div class="timeline-title">機房巡檢表時間修正</div>
-                    <span class="timeline-cat cat-important">重要</span>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
+                <div class="timeline-content" onclick="showModal('3/31 重要', '6項任務完成\n- 3月遠傳請款\n- ESG秋美座位異動\n- 訪客防火牆設置')">
                     <div class="timeline-date">2026/03/31</div>
-                    <div class="timeline-title">3月遠傳請款 / ESG座位異動 / 訪客防火牆設置</div>
+                    <div class="timeline-title">6項任務完成（含訪客防火牆優化）</div>
                     <span class="timeline-cat cat-important">重要</span>
                 </div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
-                <div class="timeline-content">
+                <div class="timeline-content" onclick="showModal('3/30 緊急', '會計系統更新\n4月電話表更新\n永芳組長電腦更新異常')">
                     <div class="timeline-date">2026/03/30</div>
                     <div class="timeline-title">會計系統更新 / 4月電話表更新</div>
                     <span class="timeline-cat cat-urgent">緊急</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content" onclick="showModal('3/24-26', '4項重要任務\n- 每月請款自動化設計\n- 電話分機系統升級\n- 婉君螢幕異常')">
+                    <div class="timeline-date">2026/03/24-26</div>
+                    <div class="timeline-title">自動化腳本 + 設備異常處理</div>
+                    <span class="timeline-cat cat-normal">一般</span>
                 </div>
             </div>
         </div>
@@ -245,56 +236,63 @@
 
     <!-- Slide 4: Categories -->
     <div class="slide" id="slide-3">
-        <h1 style="font-size: 2.5em; text-align: center;">🏷️ 任務類別分析</h1>
+        <h1 style="font-size: 2.5em; text-align: center; margin-bottom: 20px;">🏷️ 任務類別分布</h1>
         <div class="cat-grid">
-            <div class="cat-card" onclick="alert('重要任務: 18項\n占比 78%\n\n包含：\n• 人員異動處理 (報到/離職)\n• 機房系統優化\n• 自動化腳本建置')">
-                <h3>⭐ 重要任務</h3>
-                <div class="cat-bar"><div class="cat-bar-fill" style="width: 78%; background: linear-gradient(90deg, #eab308, #fbbf24);"></div></div>
-                <div><span class="cat-count">18</span><span class="cat-percent">78%</span></div>
+            <div class="cat-card" onclick="showModal('重要任務 18項', '⭐ 佔比 78%\n\n包含:\n• 人員異動處理\n• 機房系統優化\n• 自動化腳本建置\n• 資安相關處理\n• 設備異常維修')">
+                <div class="cat-icon">⭐</div>
+                <h3>重要任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--yellow), #fbbf24);"></div></div>
+                <div><span class="cat-count">18</span><span class="cat-percent"> / 78%</span></div>
             </div>
-            <div class="cat-card" onclick="alert('一般任務: 4項\n占比 17%\n\n包含：\n• 電話問題處理\n• VPN 安裝\n• 自動化偵錯')">
-                <h3>📌 一般任務</h3>
-                <div class="cat-bar"><div class="cat-bar-fill" style="width: 17%; background: linear-gradient(90deg, #22c55e, #4ade80);"></div></div>
-                <div><span class="cat-count">4</span><span class="cat-percent">17%</span></div>
+            <div class="cat-card" onclick="showModal('一般任務 4項', '📌 佔比 17%\n\n包含:\n• 電話問題處理\n• VPN 安裝\n• 自動化偵錯\n• 螢幕異常')">
+                <div class="cat-icon">📌</div>
+                <h3>一般任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 17%; background: linear-gradient(90deg, var(--green), #4ade80);"></div></div>
+                <div><span class="cat-count">4</span><span class="cat-percent"> / 17%</span></div>
             </div>
-            <div class="cat-card" onclick="alert('緊急任務: 1項\n占比 5%\n\n• 會計系統更新')">
-                <h3>🚨 緊急任務</h3>
-                <div class="cat-bar"><div class="cat-bar-fill" style="width: 5%; background: linear-gradient(90deg, #ef4444, #f87171);"></div></div>
-                <div><span class="cat-count">1</span><span class="cat-percent">5%</span></div>
+            <div class="cat-card" onclick="showModal('緊急任務 1項', '🚨 佔比 5%\n\n• 會計系統更新\n  (3/30 緊急處理)')">
+                <div class="cat-icon">🚨</div>
+                <h3>緊急任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 5%; background: linear-gradient(90deg, var(--red), #f87171);"></div></div>
+                <div><span class="cat-count">1</span><span class="cat-percent"> / 5%</span></div>
             </div>
         </div>
     </div>
 
     <!-- Slide 5: Highlights -->
     <div class="slide" id="slide-4">
-        <h1 style="font-size: 2.5em; text-align: center;">✨ 重點項目</h1>
-        <div class="highlights">
-            <div class="highlight-card" onclick="alert('📋 人員異動處理\n\n期內處理:\n• 報到: 淡凱郁 (3/25)\n• 離職: 宋明翰、王姿婷等多筆\n• 座位異動: ESG秋美、子鋒、瑞儀等\n\n幾乎每天都有異動，是最高頻任務')">
+        <h1 style="font-size: 2.5em; text-align: center; margin-bottom: 20px;">✨ 重點項目</h1>
+        <div class="highlights-grid">
+            <div class="highlight-card" onclick="showModal('👥 人員異動高頻處理', '半月內處理 7+ 人員異動:\n\n報到:\n• 淡凱郁 (3/25)\n• 李家愷 (4/7)\n\n離職:\n• 宋明翰、王姿婷\n• 張文櫻、蔡維仁\n\n座位異動:\n• ESG秋美、子鋒、瑞儀')">
                 <div class="highlight-icon">👥</div>
                 <div class="highlight-title">人員異動高頻處理</div>
-                <div class="highlight-desc">半月內處理 7+ 人員報到/離職/異動，平均每天都有相關任務</div>
+                <div class="highlight-desc">半月內處理 7+ 人員報到、離職、異動，平均每天都有相關任務</div>
+                <div class="highlight-count">7+ 件</div>
             </div>
-            <div class="highlight-card" onclick="alert('🔒 資安與防火牆優化\n\n完成項目:\n• 訪客防火牆設置 (3/31)\n• 宋明翰 AD 登入異常處理\n• 婉君螢幕異常處理')">
+            <div class="highlight-card" onclick="showModal('🔒 資安與防火牆優化', '完成項目:\n• 訪客防火牆設置 (3/31)\n  - 全用戶限流\n  - 中國區域封鎖\n  - DNS網域封鎖\n\n• 宋明翰 AD 登入異常\n• 副院 LINE 異常處理')">
                 <div class="highlight-icon">🔒</div>
                 <div class="highlight-title">資安與系統安全</div>
                 <div class="highlight-desc">完成訪客防火牆設置、AD 登入異常處理等資安相關任務</div>
+                <div class="highlight-count">4+ 件</div>
             </div>
-            <div class="highlight-card" onclick="alert('⚡ 自動化腳本建置\n\n完成項目:\n• 自動化請款時間修正 (4/1)\n• 每月請款自動化設計 (3/24)\n• 機房巡檢表時間修正 (4/1)\n• 自動化環境建置')">
+            <div class="highlight-card" onclick="showModal('⚡ 自動化腳本建置', '完成項目:\n• 自動化請款時間修正 (4/1)\n  - 時區問題已修正\n\n• 每月請款自動化設計 (3/24)\n  - 文件已整合完畢\n\n• 機房巡檢表時間修正 (4/1)')">
                 <div class="highlight-icon">⚡</div>
                 <div class="highlight-title">自動化腳本建置</div>
                 <div class="highlight-desc">優化多項自動化流程，包含請款、機房巡檢等系統</div>
+                <div class="highlight-count">3+ 件</div>
             </div>
-            <div class="highlight-card" onclick="alert('💻 設備與網路維護\n\n完成項目:\n• lulu/婉君/慧貞組長螢幕異常\n• 永芳組長電腦更新異常\n• 電話分機系統資料庫升級')">
+            <div class="highlight-card" onclick="showModal('💻 設備與網路維護', '完成項目:\n• lulu 螢幕異常\n• 婉君 螢幕異常\n• 慧貞組長筆電\n• 永芳組長電腦更新\n• 電話分機系統升級\n• 瑞儀/子鋒 座位異動')">
                 <div class="highlight-icon">💻</div>
                 <div class="highlight-title">設備與網路維護</div>
                 <div class="highlight-desc">處理多起螢幕、筆電、網路電話等設備異常問題</div>
+                <div class="highlight-count">6+ 件</div>
             </div>
         </div>
     </div>
 
     <!-- Slide 6: Summary -->
     <div class="slide" id="slide-5">
-        <div class="summary-box">
+        <div class="summary-card">
             <h2>📊 半個月工作總結</h2>
             <div class="summary-stats">
                 <div class="summary-stat">
@@ -310,57 +308,120 @@
                     <div class="label">待追蹤</div>
                 </div>
             </div>
-            <p style="margin-top: 40px; color: #94a3b8; font-size: 1.1em; line-height: 1.8;">
-                這半個月的工作以 <strong style="color:#60a5fa;">人員異動處理</strong> 為最高優先，<br>
-                同時完成多項 <strong style="color:#a78bfa;">資安優化</strong> 與 <strong style="color:#4ade80;">自動化腳本</strong> 建置。
-            </p>
-            <p style="margin-top: 30px; color: #64748b;">
+            <div class="summary-note">
+                這半個月的工作以 <strong>人員異動處理</strong> 為最高優先，<br>
+                同時完成多項 <strong>資安優化</strong> 與 <strong>自動化腳本</strong> 建置。
+            </div>
+            <p style="margin-top: 40px; color: var(--text-dim);">
                 📅 報告時間：2026年4月7日 | FastWork 工作看板
             </p>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">詳情</h3>
+            <p id="modal-text" style="line-height: 1.8; color: var(--text-dim);"></p>
+            <button class="modal-close" onclick="closeModal()">關閉</button>
+        </div>
+    </div>
+
     <script>
+        // Slide Navigation
         let currentSlide = 0;
         const totalSlides = 6;
 
         function showSlide(n) {
             const slides = document.querySelectorAll('.slide');
-            const dots = document.querySelectorAll('.nav-dot');
-            
-            if (n >= totalSlides) currentSlide = 0;
-            if (n < 0) currentSlide = totalSlides - 1;
+            const navBtns = document.querySelectorAll('.nav-btn');
             
             slides.forEach(s => s.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
+            navBtns.forEach(b => b.classList.remove('active'));
             
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
-            document.getElementById('current').textContent = currentSlide + 1;
+            slides[n].classList.add('active');
+            navBtns[n].classList.add('active');
+            document.getElementById('current').textContent = n + 1;
+            
+            // Re-trigger chart animations when on chart slide
+            if (n === 1) initCharts();
         }
 
-        function nextSlide() { currentSlide++; showSlide(currentSlide); }
-        function prevSlide() { currentSlide--; showSlide(currentSlide); }
+        function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; showSlide(currentSlide); }
+        function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; showSlide(currentSlide); }
         function goToSlide(n) { currentSlide = n; showSlide(currentSlide); }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
-            if (e.key === 'ArrowLeft') prevSlide();
-        });
-
-        // Touch swipe support
+        // Keyboard & Touch
+        document.addEventListener('keydown', e => { if(e.key==='ArrowRight'||e.key===' ')nextSlide(); if(e.key==='ArrowLeft')prevSlide(); });
         let touchStartX = 0;
         document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-        document.addEventListener('touchend', e => {
-            const diff = touchStartX - e.changedTouches[0].screenX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) nextSlide();
-                else prevSlide();
-            }
-        });
+        document.addEventListener('touchend', e => { const d = touchStartX - e.changedTouches[0].screenX; if(Math.abs(d)>50) d>0?nextSlide():prevSlide(); });
 
-        // Initialize
+        // Modal
+        function showModal(title, text) { document.getElementById('modal-title').textContent = title; document.getElementById('modal-text').textContent = text; document.getElementById('modal').classList.add('active'); }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal')closeModal(); });
+
+        // Charts
+        let chartsInitialized = false;
+        function initCharts() {
+            if (chartsInitialized) return;
+            chartsInitialized = true;
+
+            // Pie Chart
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已完成', '進行中', '待處理'],
+                    datasets: [{
+                        data: [23, 3, 4],
+                        backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { size: 14 } } }
+                    }
+                }
+            });
+
+            // Bar Chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['3/24', '3/25', '3/26', '3/30', '3/31', '4/1', '4/7'],
+                    datasets: [{
+                        label: '完成任務數',
+                        data: [4, 2, 3, 4, 6, 4, 1],
+                        backgroundColor: 'rgba(6, 182, 212, 0.7)',
+                        borderColor: '#06b6d4',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#94a3b8', stepSize: 2 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Init
         showSlide(0);
     </script>
 </body>
