@@ -3,217 +3,365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3月份工作報告 | FastWork</title>
+    <title>工作報告 2026/3/24 - 4/7 | FastWork</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'PingFang TC', sans-serif; background: #f5f7fa; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        body { font-family: 'Segoe UI', 'PingFang TC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
         
-        /* Header */
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 16px; margin-bottom: 30px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; opacity: 0.9; }
+        /* Slide Navigation */
+        .slide-nav { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 8px; }
+        .nav-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.3s; }
+        .nav-dot:hover, .nav-dot.active { background: #60a5fa; transform: scale(1.2); }
         
-        /* Stats Cards */
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        .stat-card .number { font-size: 3em; font-weight: bold; }
-        .stat-card .label { font-size: 1em; color: #666; margin-top: 5px; }
-        .stat-card.urgent .number { color: #e74c3c; }
-        .stat-card.important .number { color: #f39c12; }
-        .stat-card.normal .number { color: #27ae60; }
-        .stat-card.done .number { color: #3498db; }
+        /* Slides */
+        .slide { min-height: 100vh; padding: 60px 80px; display: none; animation: fadeIn 0.5s ease; }
+        .slide.active { display: flex; flex-direction: column; justify-content: center; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Section */
-        .section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .section h2 { font-size: 1.5em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
+        /* Slide 1 - Overview */
+        .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .stat-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transition: transform 0.3s; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card .number { font-size: 5em; font-weight: bold; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card .label { font-size: 1.5em; margin-top: 10px; color: #94a3b8; }
+        .stat-card .trend { font-size: 0.9em; margin-top: 10px; padding: 5px 15px; border-radius: 20px; display: inline-block; }
+        .trend.up { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .trend.down { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         
-        /* Task List */
-        .task-list { list-style: none; }
-        .task-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee; transition: background 0.2s; }
-        .task-item:last-child { border-bottom: none; }
-        .task-item:hover { background: #f8f9fa; }
-        .task-date { min-width: 100px; color: #888; font-size: 0.9em; }
-        .task-cat { padding: 4px 12px; border-radius: 20px; font-size: 0.8em; margin-right: 15px; min-width: 60px; text-align: center; }
-        .task-cat.urgent { background: #ffeaa7; color: #d63031; }
-        .task-cat.important { background: #dfe6e9; color: #2d3436; }
-        .task-cat.normal { background: #d4edda; color: #155724; }
-        .task-title { flex: 1; }
-        .task-content { font-size: 0.85em; color: #666; margin-top: 5px; }
+        /* Slide 2 - Status */
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+        .donut-chart { position: relative; width: 250px; height: 250px; margin: 0 auto; }
+        .donut-chart::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: #0f172a; border-radius: 50%; }
+        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1; }
+        .donut-center .num { font-size: 2.5em; font-weight: bold; color: #60a5fa; }
+        .donut-center .txt { font-size: 0.9em; color: #94a3b8; }
+        .status-legend { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
+        .legend-item { display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: rgba(255,255,255,0.05); border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+        .legend-item:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .legend-color { width: 20px; height: 20px; border-radius: 6px; }
+        .legend-label { font-size: 1.1em; }
+        .legend-count { margin-left: auto; font-size: 1.5em; font-weight: bold; color: #60a5fa; }
         
-        /* Summary */
-        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .summary-item { display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; }
-        .summary-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2em; }
-        .summary-icon.completed { background: #d4edda; }
-        .summary-icon.personnel { background: #cce5ff; }
-        .summary-icon.tech { background: #fff3cd; }
-        .summary-icon.network { background: #f8d7da; }
-        .summary-text { font-size: 0.95em; }
-        .summary-count { font-size: 1.5em; font-weight: bold; margin-right: 10px; }
+        /* Slide 3 - Timeline */
+        .timeline { position: relative; max-width: 900px; margin: 40px auto; }
+        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #60a5fa, #a78bfa, #f472b6); transform: translateX(-50%); }
+        .timeline-item { display: flex; margin-bottom: 30px; position: relative; }
+        .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+        .timeline-content { width: 45%; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; cursor: pointer; transition: all 0.3s; }
+        .timeline-content:hover { background: rgba(255,255,255,0.1); transform: scale(1.02); }
+        .timeline-dot { position: absolute; left: 50%; top: 20px; width: 16px; height: 16px; background: #60a5fa; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px rgba(96, 165, 250, 0.5); }
+        .timeline-date { font-size: 0.85em; color: #94a3b8; margin-bottom: 8px; }
+        .timeline-title { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
+        .timeline-cat { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.8em; margin-top: 8px; }
+        .cat-urgent { background: rgba(239, 68, 68, 0.3); color: #f87171; }
+        .cat-important { background: rgba(250, 204, 21, 0.3); color: #fbbf24; }
+        .cat-normal { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
         
-        /* Footer */
-        .footer { text-align: center; padding: 30px; color: #888; font-size: 0.9em; }
+        /* Slide 4 - Categories */
+        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 40px; }
+        .cat-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; }
+        .cat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .cat-card h3 { font-size: 1.3em; margin-bottom: 15px; }
+        .cat-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        .cat-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .cat-count { font-size: 2em; font-weight: bold; color: #60a5fa; }
+        .cat-percent { font-size: 0.9em; color: #94a3b8; margin-left: 10px; }
         
-        /* Print */
-        @media print { body { background: white; } .section { box-shadow: none; border: 1px solid #ddd; } }
+        /* Slide 5 - Highlights */
+        .highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
+        .highlight-card { background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; }
+        .highlight-card:hover { transform: scale(1.02); border-color: rgba(96, 165, 250, 0.6); }
+        .highlight-icon { font-size: 3em; margin-bottom: 15px; }
+        .highlight-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
+        .highlight-desc { color: #94a3b8; font-size: 0.95em; line-height: 1.6; }
+        
+        /* Slide 6 - Summary */
+        .summary-box { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 25px; padding: 50px; margin-top: 40px; text-align: center; }
+        .summary-box h2 { font-size: 2.5em; margin-bottom: 30px; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .summary-stats { display: flex; justify-content: center; gap: 60px; }
+        .summary-stat .num { font-size: 4em; font-weight: bold; color: #60a5fa; }
+        .summary-stat .label { font-size: 1.2em; color: #94a3b8; }
+        
+        /* Navigation */
+        .nav-arrows { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+        .nav-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; color: white; cursor: pointer; transition: all 0.3s; font-size: 1em; }
+        .nav-btn:hover { background: #60a5fa; border-color: #60a5fa; }
+        
+        /* Slide indicator */
+        .slide-counter { position: fixed; bottom: 30px; right: 30px; font-size: 1.2em; color: #94a3b8; z-index: 100; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide { padding: 40px 30px; }
+            .overview-grid, .chart-container, .cat-grid { grid-template-columns: 1fr; }
+            .timeline::before { left: 20px; }
+            .timeline-item, .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+            .timeline-content { width: calc(100% - 50px); }
+            .timeline-dot { left: 20px; }
+        }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.6s ease forwards; }
+        .delay-1 { animation-delay: 0.2s; opacity: 0; }
+        .delay-2 { animation-delay: 0.4s; opacity: 0; }
+        .delay-3 { animation-delay: 0.6s; opacity: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📊 3月份工作報告</h1>
-            <p>FastWork 工作看板 | 2026年3月1日 - 3月31日</p>
-        </div>
-        
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-card">
-                <div class="number" style="color:#3498db;">77</div>
-                <div class="label">完成任務總數</div>
+    <!-- Navigation -->
+    <div class="slide-nav">
+        <div class="nav-dot active" onclick="goToSlide(0)"></div>
+        <div class="nav-dot" onclick="goToSlide(1)"></div>
+        <div class="nav-dot" onclick="goToSlide(2)"></div>
+        <div class="nav-dot" onclick="goToSlide(3)"></div>
+        <div class="nav-dot" onclick="goToSlide(4)"></div>
+        <div class="nav-dot" onclick="goToSlide(5)"></div>
+    </div>
+    <div class="slide-counter"><span id="current">1</span> / 6</div>
+    <div class="nav-arrows">
+        <button class="nav-btn" onclick="prevSlide()">◀ 上一頁</button>
+        <button class="nav-btn" onclick="nextSlide()">下一頁 ▶</button>
+    </div>
+
+    <!-- Slide 1: Overview -->
+    <div class="slide active" id="slide-0">
+        <h1 style="font-size: 3em; text-align: center; margin-bottom: 20px;">📊 工作概覽</h1>
+        <p style="text-align: center; color: #94a3b8; font-size: 1.3em;">2026年3月24日 - 4月7日 | 為期半個月</p>
+        <div class="overview-grid">
+            <div class="stat-card fade-in delay-1">
+                <div class="number">23</div>
+                <div class="label">已完成任務</div>
+                <div class="trend up">▲ 78% 完成率</div>
             </div>
-            <div class="stat-card urgent">
-                <div class="number">12</div>
-                <div class="label">緊急任務</div>
+            <div class="stat-card fade-in delay-2">
+                <div class="number">3</div>
+                <div class="label">進行中</div>
+                <div class="trend down">▼ 10% 進行中</div>
             </div>
-            <div class="stat-card important">
-                <div class="number">29</div>
-                <div class="label">重要任務</div>
-            </div>
-            <div class="stat-card normal">
-                <div class="number">36</div>
-                <div class="label">一般任務</div>
-            </div>
-        </div>
-        
-        <!-- Summary -->
-        <div class="section">
-            <h2>📋 工作摘要</h2>
-            <div class="summary">
-                <div class="summary-item">
-                    <div class="summary-icon completed">✅</div>
-                    <div class="summary-text">
-                        <div class="summary-count">77</div>
-                        <div>任務已完成並歸檔</div>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-icon personnel">👥</div>
-                    <div class="summary-text">
-                        <div class="summary-count">7</div>
-                        <div>人員異動處理（報到/離職）</div>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-icon tech">💻</div>
-                    <div class="summary-text">
-                        <div class="summary-count">15+</div>
-                        <div>資訊設備相關處理</div>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-icon network">🌐</div>
-                    <div class="summary-text">
-                        <div class="summary-count">8+</div>
-                        <div>網路/電話系統維護</div>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-icon completed">📝</div>
-                    <div class="summary-text">
-                        <div class="summary-count">3</div>
-                        <div>自動化系統建置</div>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-icon completed">🔒</div>
-                    <div class="summary-text">
-                        <div class="summary-count">2</div>
-                        <div>資安相關處理</div>
-                    </div>
-                </div>
+            <div class="stat-card fade-in delay-3">
+                <div class="number">4</div>
+                <div class="label">待處理</div>
+                <div class="trend down">▼ 12% 待處理</div>
             </div>
         </div>
-        
-        <!-- 緊急任務 -->
-        <div class="section">
-            <h2>🚨 緊急任務（12筆）</h2>
-            <ul class="task-list">
-                <li class="task-item"><span class="task-date">03/02</span><span class="task-cat urgent">緊急</span><div><div class="task-title">卡鍾異常處理</div></div></li>
-                <li class="task-item"><span class="task-date">03/02</span><span class="task-cat urgent">緊急</span><div><div class="task-title">蔡宜璇 新增桌機需求</div></div></li>
-                <li class="task-item"><span class="task-date">03/04</span><span class="task-cat urgent">緊急</span><div><div class="task-title">卡鍾設備</div></div></li>
-                <li class="task-item"><span class="task-date">03/06</span><span class="task-cat urgent">緊急</span><div><div class="task-title">院多開始有部份同仁表示slack啟用異常</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat urgent">緊急</span><div><div class="task-title">數位優化專案小組 信箱錯誤</div></div></li>
-                <li class="task-item"><span class="task-date">03/10</span><span class="task-cat urgent">緊急</span><div><div class="task-title">離職 市場處TCCF統籌組專案人員李慧淩</div></div></li>
-                <li class="task-item"><span class="task-date">03/16</span><span class="task-cat urgent">緊急</span><div><div class="task-title">志淳電腦無法登入</div></div></li>
-                <li class="task-item"><span class="task-date">03/16</span><span class="task-cat urgent">緊急</span><div><div class="task-title">中華電信三月請款</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat urgent">緊急</span><div><div class="task-title">離職-行管處資訊組專員蔡維仁</div></div></li>
-                <li class="task-item"><span class="task-date">03/19</span><span class="task-cat urgent">緊急</span><div><div class="task-title">協助瞭解2/26下午網路狀況</div></div></li>
-                <li class="task-item"><span class="task-date">03/20</span><span class="task-cat urgent">緊急</span><div><div class="task-title">行管處辦公區AP更換</div></div></li>
-                <li class="task-item"><span class="task-date">03/20</span><span class="task-cat urgent">緊急</span><div><div class="task-title">張文櫻離職</div></div></li>
-            </ul>
-        </div>
-        
-        <!-- 重要任務 -->
-        <div class="section">
-            <h2>⭐ 重要任務（29筆）- 精選</h2>
-            <ul class="task-list">
-                <li class="task-item"><span class="task-date">03/02</span><span class="task-cat important">重要</span><div><div class="task-title">匯整所有專案的會議記錄</div></div></li>
-                <li class="task-item"><span class="task-date">03/04</span><span class="task-cat important">重要</span><div><div class="task-title">找尋遺失的電話財產編號</div></div></li>
-                <li class="task-item"><span class="task-date">03/05</span><span class="task-cat important">重要</span><div><div class="task-title">徐菱 網站無法使用</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat important">重要</span><div><div class="task-title">機房檢核流程建置</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat important">重要</span><div><div class="task-title">建置系統開發環境</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat important">重要</span><div><div class="task-title">楊副手機SLACK無法啟用</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat important">重要</span><div><div class="task-title">佩菱 FTP使用問題</div></div></li>
-                <li class="task-item"><span class="task-date">03/11</span><span class="task-cat important">重要</span><div><div class="task-title">紫瑜座位移動</div></div></li>
-                <li class="task-item"><span class="task-date">03/11</span><span class="task-cat important">重要</span><div><div class="task-title">君霖座位移動</div></div></li>
-                <li class="task-item"><span class="task-date">03/11</span><span class="task-cat important">重要</span><div><div class="task-title">宸宇網路電話異常</div></div></li>
-                <li class="task-item"><span class="task-date">03/11</span><span class="task-cat important">重要</span><div><div class="task-title">子玲slack啟用異常</div></div></li>
-                <li class="task-item"><span class="task-date">03/16</span><span class="task-cat important">重要</span><div><div class="task-title">機房檢核機器人</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat important">重要</span><div><div class="task-title">宜璇PDF啟用失敗</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat important">重要</span><div><div class="task-title">佩菱-網站上不去</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat important">重要</span><div><div class="task-title">人資印表機網段變更</div></div></li>
-                <li class="task-item"><span class="task-date">03/19</span><span class="task-cat important">重要</span><div><div class="task-title">蘇處長電腦更新異常</div></div></li>
-                <li class="task-item"><span class="task-date">03/23</span><span class="task-cat important">重要</span><div><div class="task-title">個人終端自動化環境建置</div></div></li>
-                <li class="task-item"><span class="task-date">03/23</span><span class="task-cat important">重要</span><div><div class="task-title">清冊同步script建置</div></div></li>
-                <li class="task-item"><span class="task-date">03/24</span><span class="task-cat important">重要</span><div><div class="task-title">每月請款自動化設計&測試</div></div></li>
-                <li class="task-item"><span class="task-date">03/24</span><span class="task-cat important">重要</span><div><div class="task-title">電話座位分機系統資料庫升級</div></div></li>
-                <li class="task-item"><span class="task-date">03/26</span><span class="task-cat important">重要</span><div><div class="task-title">慧貞組長筆電問題</div></div></li>
-                <li class="task-item"><span class="task-date">03/26</span><span class="task-cat important">重要</span><div><div class="task-title">副院line異常</div></div></li>
-            </ul>
-        </div>
-        
-        <!-- 一般任務 -->
-        <div class="section">
-            <h2>📌 一般任務（36筆）- 精選</h2>
-            <ul class="task-list">
-                <li class="task-item"><span class="task-date">03/02</span><span class="task-cat normal">一般</span><div><div class="task-title">顧問討論</div></div></li>
-                <li class="task-item"><span class="task-date">03/04</span><span class="task-cat normal">一般</span><div><div class="task-title">ducker建置</div></div></li>
-                <li class="task-item"><span class="task-date">03/04</span><span class="task-cat normal">一般</span><div><div class="task-title">ducker環境部署測試</div></div></li>
-                <li class="task-item"><span class="task-date">03/04</span><span class="task-cat normal">一般</span><div><div class="task-title">奇妨筆電準備</div></div></li>
-                <li class="task-item"><span class="task-date">03/05</span><span class="task-cat normal">一般</span><div><div class="task-title">宏遠二月請款</div></div></li>
-                <li class="task-item"><span class="task-date">03/06</span><span class="task-cat normal">一般</span><div><div class="task-title">電話表更新0307</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat normal">一般</span><div><div class="task-title">slack群組盤點</div></div></li>
-                <li class="task-item"><span class="task-date">03/09</span><span class="task-cat normal">一般</span><div><div class="task-title">淳雅-slack權限調整</div></div></li>
-                <li class="task-item"><span class="task-date">03/10</span><span class="task-cat normal">一般</span><div><div class="task-title">設置共用桌機</div></div></li>
-                <li class="task-item"><span class="task-date">03/10</span><span class="task-cat normal">一般</span><div><div class="task-title">詮立光請款作業</div></div></li>
-                <li class="task-item"><span class="task-date">03/12</span><span class="task-cat normal">一般</span><div><div class="task-title">傳毅TO DO功能異常</div></div></li>
-                <li class="task-item"><span class="task-date">03/16</span><span class="task-cat normal">一般</span><div><div class="task-title">晶瑩AI改圖問題</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat normal">一般</span><div><div class="task-title">卓昂詢問claude是否能裝電腦版</div></div></li>
-                <li class="task-item"><span class="task-date">03/17</span><span class="task-cat normal">一般</span><div><div class="task-title">協助開通Google Workspace Marketplace</div></div></li>
-                <li class="task-item"><span class="task-date">03/20</span><span class="task-cat normal">一般</span><div><div class="task-title">蘇處長CC安裝</div></div></li>
-                <li class="task-item"><span class="task-date">03/23</span><span class="task-cat normal">一般</span><div><div class="task-title">本週電話總表更新</div></div></li>
-                <li class="task-item"><span class="task-date">03/24</span><span class="task-cat normal">一般</span><div><div class="task-title">佳欣電話待接問題</div></div></li>
-                <li class="task-item"><span class="task-date">03/25</span><span class="task-cat normal">一般</span><div><div class="task-title">VPN應用程式安裝</div></div></li>
-            </ul>
-        </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <p>📅 報告生成時間：2026年4月2日 | FastWork 工作看板</p>
-            <p>❤️ 由 Sabrina 的 AI 助理 sabrina 製作</p>
+        <div style="text-align: center; margin-top: 40px; color: #64748b;">
+            <p>點擊任意卡片進入詳細分析 →</p>
         </div>
     </div>
+
+    <!-- Slide 2: Status Distribution -->
+    <div class="slide" id="slide-1">
+        <h1 style="font-size: 2.5em; text-align: center;">📈 任務狀態分布</h1>
+        <div class="chart-container">
+            <div class="donut-chart">
+                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="12"/>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" stroke-width="12" 
+                        stroke-dasharray="163.36 251.33" stroke-dashoffset="0" class="donut-segment"/>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#eab308" stroke-width="12" 
+                        stroke-dasharray="20.42 251.33" stroke-dashoffset="-163.36" class="donut-segment"/>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" stroke-width="12" 
+                        stroke-dasharray="8.17 251.33" stroke-dashoffset="-183.78" class="donut-segment"/>
+                </svg>
+                <div class="donut-center">
+                    <div class="num">30</div>
+                    <div class="txt">總任務</div>
+                </div>
+            </div>
+            <div class="status-legend">
+                <div class="legend-item" onclick="alert('已完成: 23 項重要任務，包括：\n• 機房巡檢優化\n• 人員報到/離職異動\n• 自動化腳本建置')">
+                    <div class="legend-color" style="background: #22c55e;"></div>
+                    <div class="legend-label">已完成 (DONE)</div>
+                    <div class="legend-count">23</div>
+                </div>
+                <div class="legend-item" onclick="alert('進行中: 3 項\n• 報到-李家愷\n• 觀察訪客網路\n• 其他')">
+                    <div class="legend-color" style="background: #eab308;"></div>
+                    <div class="legend-label">進行中 (DOING)</div>
+                    <div class="legend-count">3</div>
+                </div>
+                <div class="legend-item" onclick="alert('待處理: 4 項\n• 分享會支援\n• 留停-李育瑄\n• 其他')">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <div class="legend-label">待處理 (TODO)</div>
+                    <div class="legend-count">4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Timeline -->
+    <div class="slide" id="slide-2">
+        <h1 style="font-size: 2.5em; text-align: center;">📅 完成時間軸</h1>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/04/07</div>
+                    <div class="timeline-title">戴瑞儀 分機無法撥出</div>
+                    <span class="timeline-cat cat-important">重要</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/04/01</div>
+                    <div class="timeline-title">4月宏遠請款作業</div>
+                    <span class="timeline-cat cat-important">重要</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/04/01</div>
+                    <div class="timeline-title">lulu螢幕異常</div>
+                    <span class="timeline-cat cat-important">重要</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/04/01</div>
+                    <div class="timeline-title">機房巡檢表時間修正</div>
+                    <span class="timeline-cat cat-important">重要</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/03/31</div>
+                    <div class="timeline-title">3月遠傳請款 / ESG座位異動 / 訪客防火牆設置</div>
+                    <span class="timeline-cat cat-important">重要</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2026/03/30</div>
+                    <div class="timeline-title">會計系統更新 / 4月電話表更新</div>
+                    <span class="timeline-cat cat-urgent">緊急</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Categories -->
+    <div class="slide" id="slide-3">
+        <h1 style="font-size: 2.5em; text-align: center;">🏷️ 任務類別分析</h1>
+        <div class="cat-grid">
+            <div class="cat-card" onclick="alert('重要任務: 18項\n占比 78%\n\n包含：\n• 人員異動處理 (報到/離職)\n• 機房系統優化\n• 自動化腳本建置')">
+                <h3>⭐ 重要任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 78%; background: linear-gradient(90deg, #eab308, #fbbf24);"></div></div>
+                <div><span class="cat-count">18</span><span class="cat-percent">78%</span></div>
+            </div>
+            <div class="cat-card" onclick="alert('一般任務: 4項\n占比 17%\n\n包含：\n• 電話問題處理\n• VPN 安裝\n• 自動化偵錯')">
+                <h3>📌 一般任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 17%; background: linear-gradient(90deg, #22c55e, #4ade80);"></div></div>
+                <div><span class="cat-count">4</span><span class="cat-percent">17%</span></div>
+            </div>
+            <div class="cat-card" onclick="alert('緊急任務: 1項\n占比 5%\n\n• 會計系統更新')">
+                <h3>🚨 緊急任務</h3>
+                <div class="cat-bar"><div class="cat-bar-fill" style="width: 5%; background: linear-gradient(90deg, #ef4444, #f87171);"></div></div>
+                <div><span class="cat-count">1</span><span class="cat-percent">5%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Highlights -->
+    <div class="slide" id="slide-4">
+        <h1 style="font-size: 2.5em; text-align: center;">✨ 重點項目</h1>
+        <div class="highlights">
+            <div class="highlight-card" onclick="alert('📋 人員異動處理\n\n期內處理:\n• 報到: 淡凱郁 (3/25)\n• 離職: 宋明翰、王姿婷等多筆\n• 座位異動: ESG秋美、子鋒、瑞儀等\n\n幾乎每天都有異動，是最高頻任務')">
+                <div class="highlight-icon">👥</div>
+                <div class="highlight-title">人員異動高頻處理</div>
+                <div class="highlight-desc">半月內處理 7+ 人員報到/離職/異動，平均每天都有相關任務</div>
+            </div>
+            <div class="highlight-card" onclick="alert('🔒 資安與防火牆優化\n\n完成項目:\n• 訪客防火牆設置 (3/31)\n• 宋明翰 AD 登入異常處理\n• 婉君螢幕異常處理')">
+                <div class="highlight-icon">🔒</div>
+                <div class="highlight-title">資安與系統安全</div>
+                <div class="highlight-desc">完成訪客防火牆設置、AD 登入異常處理等資安相關任務</div>
+            </div>
+            <div class="highlight-card" onclick="alert('⚡ 自動化腳本建置\n\n完成項目:\n• 自動化請款時間修正 (4/1)\n• 每月請款自動化設計 (3/24)\n• 機房巡檢表時間修正 (4/1)\n• 自動化環境建置')">
+                <div class="highlight-icon">⚡</div>
+                <div class="highlight-title">自動化腳本建置</div>
+                <div class="highlight-desc">優化多項自動化流程，包含請款、機房巡檢等系統</div>
+            </div>
+            <div class="highlight-card" onclick="alert('💻 設備與網路維護\n\n完成項目:\n• lulu/婉君/慧貞組長螢幕異常\n• 永芳組長電腦更新異常\n• 電話分機系統資料庫升級')">
+                <div class="highlight-icon">💻</div>
+                <div class="highlight-title">設備與網路維護</div>
+                <div class="highlight-desc">處理多起螢幕、筆電、網路電話等設備異常問題</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Summary -->
+    <div class="slide" id="slide-5">
+        <div class="summary-box">
+            <h2>📊 半個月工作總結</h2>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div class="num">23</div>
+                    <div class="label">已完成</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="num">18</div>
+                    <div class="label">重要任務</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="num">4</div>
+                    <div class="label">待追蹤</div>
+                </div>
+            </div>
+            <p style="margin-top: 40px; color: #94a3b8; font-size: 1.1em; line-height: 1.8;">
+                這半個月的工作以 <strong style="color:#60a5fa;">人員異動處理</strong> 為最高優先，<br>
+                同時完成多項 <strong style="color:#a78bfa;">資安優化</strong> 與 <strong style="color:#4ade80;">自動化腳本</strong> 建置。
+            </p>
+            <p style="margin-top: 30px; color: #64748b;">
+                📅 報告時間：2026年4月7日 | FastWork 工作看板
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 6;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.nav-dot');
+            
+            if (n >= totalSlides) currentSlide = 0;
+            if (n < 0) currentSlide = totalSlides - 1;
+            
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            document.getElementById('current').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() { currentSlide++; showSlide(currentSlide); }
+        function prevSlide() { currentSlide--; showSlide(currentSlide); }
+        function goToSlide(n) { currentSlide = n; showSlide(currentSlide); }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Touch swipe support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
 </body>
 </html>
